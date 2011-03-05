@@ -33,14 +33,26 @@
 </style>
 
 <script language="javascript" type="text/javascript">
+
 $(document).ready(function(){
 
-  var cosPoints = []; 
+  //var userForm = document.forms.userinput;
+
+  function validInfo(form) {
+    return form.elements.fn.value;
+  }
+
+  document.forms.userinput.elements.submit.onclick = function() {
+  r = document.forms.userinput.fn.value;
+  alert(r);
+  };
+
+  var cosPoints = [];
   for (var i=0; i<6*Math.PI; i+=0.01){ 
     cosPoints.push([Math.sin(i/3)*Math.cos(i), Math.sin(i/3)*Math.sin(i)]); 
-  } 
+  }
   plot2 = $.jqplot('chart2', [cosPoints], { 
-    title:'Rhodonea', 
+    title:'Rhodonea r = sin(theta/3)', 
     series:[
         {
             showMarker:true, 
@@ -55,9 +67,11 @@ $(document).ready(function(){
 </script>
   </head>
   <body>
-<?php include "nav.inc"; ?>
-
-
-<div id="chart2" class="plot" style="width:400px;height:400px;"></div>
+    <div id="chart2" class="plot" style="width:400px;height:400px;"></div>
+    <p> Please enter a polar function below in the form r = f(theta) </p>
+    <form name="userinput">
+      <input id="fn" name="fn" ></input>
+      <input name="submit" type="submit" value = "Graph it!" /input>
+    </form>
   </body>
 </html>
