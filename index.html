@@ -44,22 +44,22 @@ $(document).ready(function(){
 
   document.forms.userinput.elements.submit.onclick = function() {
   r = document.forms.userinput.fn.value;
-  alert(r);
-  };
-
   var cosPoints = [];
   for (var i=0; i<6*Math.PI; i+=0.01){ 
-    cosPoints.push([Math.sin(i/3)*Math.cos(i), Math.sin(i/3)*Math.sin(i)]); 
+    cosPoints.push([eval('Math.'+r+'*Math.cos(i)'), eval('Math.'+r+'*Math.sin(i)')]);
   }
-  plot2 = $.jqplot('chart2', [cosPoints], { 
-    title:'Rhodonea r = sin(theta/3)', 
+  plot2 = $.jqplot('chart2', [cosPoints], {
+    title:'r = ' + r,
     series:[
         {
-            showMarker:true, 
+            showMarker:true,
             showLine: false,
         }
       ]
   });
+  alert(r);
+  };
+
 
 });
 
