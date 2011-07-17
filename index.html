@@ -5,78 +5,54 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Polar function grapher</title>
   <!--[if IE]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
-  
-  <link rel="stylesheet" type="text/css" href="css/jquery.jqplot.css" />
-  <link rel="stylesheet" type="text/css" href="css/examples.css" />
-  
+
+
   <!-- BEGIN: load jquery -->
   <script language="javascript" type="text/javascript" src="scripts/jquery-1.4.2.min.js"></script>
   <!-- END: load jquery -->
-  
-  <!-- BEGIN: load jqplot -->
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jquery.jqplot.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.barRenderer.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.categoryAxisRenderer.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.pieRenderer.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.donutRenderer.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.highlighter.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.cursor.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.funnelRenderer.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.canvasTextRenderer.js"></script>
-  <script language="javascript" type="text/javascript" src="scripts/plugins/jqplot.canvasAxisTickRenderer.js"></script>
-  <!-- END: load jqplot -->
 
+
+  <script src='raphael.js'></script>
+  <script src='raphael.graphing.js'></script>
+  <script src='raphael.gill_sans_400.font.js' type = "text/javascript"></script>
   <script src='tokens.js'></script>
+  <script src='math.js'></script>
   <script src='tdop_math.js'></script>
 
-<style type="text/css">
-.jqplot-target {
-    margin: 30px;
-}
-</style>
-
-<script language="javascript" type="text/javascript">
-
-$(document).ready(function(){
-
-  //var userForm = document.forms.userinput;
-
-  function validInfo(form) {
-    return form.elements.fn.value;
-  }
-
-  document.forms.userinput.elements.submit.onclick = function() {
-  r = document.forms.userinput.fn.value
-  var expr = parse(r);
-  var parsed_expr = to_js(expr, ['t', 'r'], constants, fns).replace(/ /gi,"");
-  var cosPoints = [];
-  for (var t=0; t<6*Math.PI; t+=0.01){ 
-    cosPoints.push([eval(parsed_expr+'*Math.cos(t)'), eval(parsed_expr+'*Math.sin(t)')]);
-    }
-  plot2 = $.jqplot('chart2', [cosPoints], {
-    title:'r = ' + r,
-    series:[
-        {
-            showMarker:true,
-            showLine: false,
-        }
-      ]
-  }).replot();
-  return(false);
-  };
-
-
-});
-
-
-</script>
 </head>
-  <body>
-    <div id="chart2" class="plot" style="width:400px;height:400px;"></div>
-    <p> Please enter a polar function below in the form r = f(t) </p>
-    <form name="userinput">
-      r = <input id="fn" name="fn" ></input>
-      <input name="submit" type="submit" value = "Graph it!" /input>
-    </form>
+<body>
+	<div id="graph1" style="width:400px; height:400px; border:1px solid #ccc; float:left; margin-right:40px; background: gray"></div>
+	<div style="float:left;width:400px;">
+  <p> Please enter a polar function below in the form r = f(t) </p>
+  <form name="userinput">
+    r = <input id="fn" name="fn" ></input>
+    <input name="submit" type="submit" value = "Graph it!" /input>
+  </form>
+  <script>
+    $().ready(function(){
+
+      document.forms.userinput.elements.submit.onclick = function() {
+        r = document.forms.userinput.fn.value
+        var expr = parse(r);
+        var parsed_expr = to_js(expr, ['t', 'r'], constants, fns).replace(/ /gi,"");
+        var cosPoints = [];
+        for (var t=0; t<6*Math.PI; t+=0.01){
+          cosPoints.push([eval(parsed_expr+'*Math.cos(t)'), eval(parsed_expr+'*Math.sin(t)')]);
+        }
+        var x_max = Math.max.apply( Math, cosPoints.map(function(entry){return Math.abs(entry[0])}) );
+        var y_max = Math.max.apply( Math, cosPoints.map(function(entry){return Math.abs(entry[1])}) );
+        var max = Math.max.apply( Math, [x_max, y_max] ) + 1
+        paper = new Raphael('graph1', 400, 400);
+        graph1 = paper.graph(400,400,20, {x_min: -1*max, x_max: max, draw_grid: true, draw_axes: true, labels: true})
+        graph1.attrs = { 'stroke': "blue", 'stroke-width': 2 }
+        graph1.text([-max+1,-max+1], r)
+        graph1.path(cosPoints)
+        return(false);
+      };
+
+
+    });
+  </script>
+
   </body>
 </html>
