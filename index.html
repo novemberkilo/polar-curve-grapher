@@ -2,57 +2,71 @@
 
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Polar function grapher</title>
-  <!--[if IE]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Polar function grapher</title>
+<!--[if IE]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
 
 
-  <!-- BEGIN: load jquery -->
-  <script language="javascript" type="text/javascript" src="scripts/jquery-1.4.2.min.js"></script>
-  <!-- END: load jquery -->
-
-
-  <script src='raphael.js'></script>
-  <script src='raphael.graphing.js'></script>
-  <script src='raphael.gill_sans_400.font.js' type = "text/javascript"></script>
-  <script src='tokens.js'></script>
-  <script src='math.js'></script>
-  <script src='tdop_math.js'></script>
-
-</head>
-<body>
-	<div id="graph1" style="width:400px; height:400px; border:1px solid #ccc; float:left; margin-right:40px; background: gray"></div>
-	<div style="float:left;width:400px;">
-  <p> Please enter a polar function below in the form r = f(t) </p>
-  <form name="userinput">
-    r = <input id="fn" name="fn" ></input>
-    <input name="submit" type="submit" value = "Graph it!" /input>
-  </form>
+<script src='tokens.js'></script>
+<script src='tdop_math.js'></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/d3.css" media="screen"></link>        
+      <meta charset=utf-8 />
+      </head>
+      <body>
+        <p>Enter a polar function below in the form r = f(t)</p>
+        <p><small>Try<i> sin(2t)cos(3t)</i></small></p>
+        <form name="userinput">r =
+              <input class="simple-input" id="fn" name="fn"></input>
+                  <input class="modern" name="submit" type="submit" value="Graph it!" /input>
+                </form>
   <script>
-    $().ready(function(){
+$().ready(function(){
 
-      document.forms.userinput.elements.submit.onclick = function() {
-        r = document.forms.userinput.fn.value
-        var expr = parse(r);
-        var parsed_expr = to_js(expr, ['t', 'r'], constants, fns).replace(/ /gi,"");
-        var cosPoints = [];
-        for (var t=0; t<6*Math.PI; t+=0.01){
-          cosPoints.push([eval(parsed_expr+'*Math.cos(t)'), eval(parsed_expr+'*Math.sin(t)')]);
-        }
-        var x_max = Math.max.apply( Math, cosPoints.map(function(entry){return Math.abs(entry[0])}) );
-        var y_max = Math.max.apply( Math, cosPoints.map(function(entry){return Math.abs(entry[1])}) );
-        var max = Math.max.apply( Math, [x_max, y_max] ) + 1
-        paper = new Raphael('graph1', 400, 400);
-        graph1 = paper.graph(400,400,20, {x_min: -1*max, x_max: max, draw_grid: true, draw_axes: true, labels: true})
-        graph1.attrs = { 'stroke': "blue", 'stroke-width': 2 }
-        graph1.text([-max+1,-max+1], r)
-        graph1.path(cosPoints)
-        return(false);
-      };
+  document.forms.userinput.elements.submit.onclick = function () {
+    r = document.forms.userinput.fn.value;
+    var expr = parse(r);
+    var parsed_expr = to_js(expr, ['t', 'r'], constants, fns).replace(/ /gi, "").
+      replace(/t(?!h)/g, 'angle(i)');
 
+    var radius = 100,
+    padding = 10,
+    radians = 2 * Math.PI;
 
+    var dimension = (2 * radius) + (2 * padding),
+    points = 50;
+
+    var angle = d3.scale.linear()
+    .domain([0, points - 1])
+    .range([0, radians]);
+
+    var line = d3.svg.line.radial()
+    .interpolate("basis")
+    .tension(0)
+    .radius(function (d, i) {
+      return eval("radius *" + parsed_expr);
+    })
+    .angle(function (d, i) {
+      return angle(i);
     });
+
+    var svg = d3.select("body").append("svg")
+    .attr("width", dimension)
+    .attr("height", dimension)
+    .append("g");
+
+    svg.append("path").datum(d3.range(points))
+    .attr("class", "line")
+    .attr("d", line)
+    .attr("transform", "translate(" + (radius + padding) + ", " + (radius + padding) + ")");
+
+    return(false);
+  };
+
+
+});
   </script>
 
   </body>
-</html>
+  </html>
